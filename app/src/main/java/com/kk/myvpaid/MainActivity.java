@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Bitmap getDefaultVideoPoster() {
-            return null;
+            return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
         }
     }
 }

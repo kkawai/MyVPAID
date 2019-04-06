@@ -50,6 +50,22 @@
               AndroidInterface.log("vast.adStart");
            });
 
+           player.on('vast.adSkip', function() {
+              AndroidInterface.log("vast.adSkip");
+           });
+
+           player.on('vast.adsCancel', function() {
+              AndroidInterface.log("vast.adsCancel");
+           });
+
+           player.on('vast.contentStart', function() {
+              AndroidInterface.log("vast.contentStart");
+           });
+
+           player.on('vast.contentEnd', function() {
+              AndroidInterface.log("vast.contentEnd");
+           });
+
         });
 
         videojs('player', {
