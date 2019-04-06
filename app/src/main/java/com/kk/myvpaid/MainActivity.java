@@ -1,10 +1,12 @@
 package com.kk.myvpaid;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -62,7 +64,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
+        webView.setBackgroundColor(Color.BLACK);
         webView.setWebViewClient(webViewClient);
+        webView.setWebChromeClient(new WebChromeClientCustomPoster());
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setHorizontalScrollBarEnabled(false);
@@ -75,8 +79,6 @@ public class MainActivity extends AppCompatActivity {
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
         Log.d(TAG,"width: " + width + " height: " + height + " density: " + displayMetrics.density);
-
-
     }
 
     private String getVastVpaidXml() {
@@ -98,5 +100,13 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return out.toString();
+    }
+
+    private class WebChromeClientCustomPoster extends WebChromeClient {
+
+        @Override
+        public Bitmap getDefaultVideoPoster() {
+            return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+        }
     }
 }
