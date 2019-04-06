@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
     @JavascriptInterface
     public void log(String message) {
-        Log.d("MyVPAID", message);
+        Log.d("MyJS", message);
     }
 
     @JavascriptInterface

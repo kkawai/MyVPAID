@@ -14,35 +14,58 @@
 
 <body style='margin:0;padding:0;' >
 
-    <video id="video_with_ad" class="video-js vjs-skin vjs-16-9"
-           preload="auto"
+    <video id="player" class="video-js vjs-skin vjs-16-9"
+           preload="none"
            poster="blankimage.png"
-           data-setup='{
-              "plugins": {
-                 "vastClient": {
-                   "adTagUrl": "https://insight.adsrvr.org/enduser/vast/?iid=7bd51e03-bb3d-41ac-b7a7-501b2482097f&crid=h1d6c44d&wp=&aid=1&wpc=USD&sfe=b16364b&puid=cd0dc590-627b-4f39-b703-4dc8872f8e90&tdid=&pid=2sl3z2r&ag=ivvk4w2&sig=CQVHn9TvJxf6KeGwld-KuohenghLvvWP9R_eNly2cfI.&cf=29411&fq=0&td_s=com.appsilicious.wallpapers&rcats=&mcat=&mste=&mfld=4&mssi=&mfsi=czmrjz0cou&uhow=136&agsa=&rgco=United%20States&rgre=Maryland&rgme=512&rgci=Baltimore&rgz=21210&svbttd=1&dt=Mobile&osf=Android&os=Android60&br=Chrome&rlangs=01&mlang=&svpid=&did=&rcxt=InApp&lat=39.355500&lon=-76.635500&tmpc=8.39&daid=cd0dc590-627b-4f39-b703-4dc8872f8e90&vp=0&osi=&osv=&bp=10&svscid=mobile-app&dvps=Medium&mk=Samsung&mdl=SM-J120A&vpb=PreRoll&svsc=AllowEither&dc=2&vcc=CA8QHhgeMgQIAggJOgQIAQgCQAFIAVADiAECoAHAAqgB4APIAQHQAQPoAQKAAgOKAgQIAggF&sv=bidswitch&pidi=1550&advi=101801&cmpi=477031&agi=1711715&cridi=3473159&svi=83&adv=5pqi8zz&cmp=27ft6ii&vpie=1&dur=Ck0KB2h4cnkxeTQQtIECIg4I7eCZARIHYmx1ZWthaSIOCO3gmQESB3pka2Jua2kiDgirlt8xEgdlMTk4Nm13Ig4I2YDmUBIHYms3aW5mbwpdCgdqeWN4NHZ5ELSBAiIOCKnQmQESB3pka2Jua2kiDgiq0JkBEgd6ZGtibmtpIg4Iq9CZARIHemRrYm5raSIOCKbkmQESB3pka2Jua2kiDgjU85kBEgd6ZGtibmtpCjsKImNoYXJnZS1hbGxJbnRlZ3JhbFZpZGVvQnJhbmRTYWZldHkiFQjm__________8BEghpbnRlZ3JhbBC0gQI.&crrelr=",
-                   "adCancelTimeout": 10000,
-                   "adsEnabled": true,
-                   "playAdAlways": true
-                 }
-              }
-           }'>
-        <source src="blankvideo.mp4" type='video/mp4'/>
+           data-setup='{}'>
+        <source src="blankvideo.mp4" type="video/mp4"/>
     </video>
 
     <script>
-        var videoPlayer = document.getElementById("video_with_ad");
-        function play() {
-            AndroidInterface.log("in play");
-            videoPlayer.play();
+        var xmlContent = AndroidInterface.getVastXML();
+        console.log("MyJS got xmlContent");
+        function requestVASTXML(callback) {
+            console.log("MyJS in requestVASTXML");
+            callback(null, xmlContent);
         }
     </script>
 
+    <script type="text/javascript">
+
+        videojs.plugin('ads-setup', function(opts) {
+
+           var player = this;
+           var vastAd = player.vastClient({
+               playAdAlways: true,
+               adCancelTimeout: 10000,
+               adsEnabled: true,
+               adTagXML: requestVASTXML
+           });
+
+           player.on('vast.adError', function(evt) {
+              AndroidInterface.log("vast.adError 1");
+           });
+
+           player.on('vast.adStart', function() {
+              AndroidInterface.log("vast.adStart");
+           });
+
+        });
+
+        videojs('player', {
+           'techOrder': ['html5'],
+           'plugins': {
+                'ads-setup': {
+                    'adsEnabled': true,
+                }
+           }
+        });
+    </script>
+
     <script>
-        var xmlContent = AndroidInterface.getVastXML();
-        function requestVASTXML(callback) {
-            AndroidInterface.log("in requestVASTXML");
-            callback(null, xmlContent);
+        function play() {
+            console.log("1 in play");
+            videojs('player').play();
         }
     </script>
 
