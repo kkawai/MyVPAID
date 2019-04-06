@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-            Log.d(TAG,"onReceivedError " + error);
+            Log.d(TAG,"onReceivedError " + error.toString());
         }
 
         @Override
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public Bitmap getDefaultVideoPoster() {
-            return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+            return null;
         }
     }
 }
