@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -37,6 +38,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageFinished(WebView view, String url) {
             Log.d(TAG,"onPageFinished " + url);
+            if (url.endsWith("sample.html")) {
+                view.loadUrl("javascript:play()");
+            }
         }
 
         @Override
@@ -73,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
+        webView.addJavascriptInterface(this, "AndroidInterface");
         String basePath = "file:android_asset/sample.html";
         webView.loadUrl(basePath);
 
@@ -81,6 +86,16 @@ public class MainActivity extends AppCompatActivity {
         int width = displayMetrics.widthPixels;
         int height = displayMetrics.heightPixels;
         Log.d(TAG,"width: " + width + " height: " + height + " density: " + displayMetrics.density);
+    }
+
+    @JavascriptInterface
+    public void log(String message) {
+        Log.d("MyVPAID", message);
+    }
+
+    @JavascriptInterface
+    public String getVastXML() {
+        return getVastVpaidXml();
     }
 
     private String getVastVpaidXml() {
