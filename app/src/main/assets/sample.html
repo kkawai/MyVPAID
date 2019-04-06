@@ -16,7 +16,7 @@
 
     <video id="video_with_ad" class="video-js vjs-skin vjs-16-9"
            preload="auto"
-           poster="blankvideo.png"
+           poster="blankimage.png"
            data-setup='{
               "plugins": {
                  "vastClient": {
@@ -33,7 +33,16 @@
     <script>
         var videoPlayer = document.getElementById("video_with_ad");
         function play() {
+            AndroidInterface.log("in play");
             videoPlayer.play();
+        }
+    </script>
+
+    <script>
+        var xmlContent = AndroidInterface.getVastXML();
+        function requestVASTXML(callback) {
+            AndroidInterface.log("in requestVASTXML");
+            callback(null, xmlContent);
         }
     </script>
 

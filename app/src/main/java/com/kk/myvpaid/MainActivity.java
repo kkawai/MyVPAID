@@ -77,9 +77,9 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
-        webView.addJavascriptInterface(this, "AndroidInterface");
         String basePath = "file:android_asset/sample.html";
         webView.loadUrl(basePath);
+        webView.addJavascriptInterface(this, "AndroidInterface");
 
         DisplayMetrics displayMetrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
