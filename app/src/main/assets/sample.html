@@ -1,0 +1,48 @@
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
+        >
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+    <title>Sample Web Page</title>
+    <link href="http://vjs.zencdn.net/5.4.6/video-js.css" rel="stylesheet">
+    <script src="http://vjs.zencdn.net/5.4.6/video.js"></script>
+    <link rel="stylesheet" href=" videojs.vast.vpaid.min.css">
+    <script type="text/javascript" src="videojs_5.vast.vpaid.min.js"></script>
+</head>
+
+<body style='margin:0;padding:0;' >
+
+    <video id="example_video_1" class="video-js vjs-skin"
+           controls preload="auto" width="412" height="232"
+           poster="http://vjs.zencdn.net/v/oceans.png"
+           data-setup='{
+              "plugins": {
+                 "vastClient": {
+                   "adTagUrl": "https://insight.adsrvr.org/enduser/vast/?iid=7bd51e03-bb3d-41ac-b7a7-501b2482097f&crid=h1d6c44d&wp=&aid=1&wpc=USD&sfe=b16364b&puid=cd0dc590-627b-4f39-b703-4dc8872f8e90&tdid=&pid=2sl3z2r&ag=ivvk4w2&sig=CQVHn9TvJxf6KeGwld-KuohenghLvvWP9R_eNly2cfI.&cf=29411&fq=0&td_s=com.appsilicious.wallpapers&rcats=&mcat=&mste=&mfld=4&mssi=&mfsi=czmrjz0cou&uhow=136&agsa=&rgco=United%20States&rgre=Maryland&rgme=512&rgci=Baltimore&rgz=21210&svbttd=1&dt=Mobile&osf=Android&os=Android60&br=Chrome&rlangs=01&mlang=&svpid=&did=&rcxt=InApp&lat=39.355500&lon=-76.635500&tmpc=8.39&daid=cd0dc590-627b-4f39-b703-4dc8872f8e90&vp=0&osi=&osv=&bp=10&svscid=mobile-app&dvps=Medium&mk=Samsung&mdl=SM-J120A&vpb=PreRoll&svsc=AllowEither&dc=2&vcc=CA8QHhgeMgQIAggJOgQIAQgCQAFIAVADiAECoAHAAqgB4APIAQHQAQPoAQKAAgOKAgQIAggF&sv=bidswitch&pidi=1550&advi=101801&cmpi=477031&agi=1711715&cridi=3473159&svi=83&adv=5pqi8zz&cmp=27ft6ii&vpie=1&dur=Ck0KB2h4cnkxeTQQtIECIg4I7eCZARIHYmx1ZWthaSIOCO3gmQESB3pka2Jua2kiDgirlt8xEgdlMTk4Nm13Ig4I2YDmUBIHYms3aW5mbwpdCgdqeWN4NHZ5ELSBAiIOCKnQmQESB3pka2Jua2kiDgiq0JkBEgd6ZGtibmtpIg4Iq9CZARIHemRrYm5raSIOCKbkmQESB3pka2Jua2kiDgjU85kBEgd6ZGtibmtpCjsKImNoYXJnZS1hbGxJbnRlZ3JhbFZpZGVvQnJhbmRTYWZldHkiFQjm__________8BEghpbnRlZ3JhbBC0gQI.&crrelr=",
+                   "adCancelTimeout": 10000,
+                   "adsEnabled": true
+                 }
+              }
+           }'>
+        <source src="http://vjs.zencdn.net/v/oceans.mp4" type='video/mp4'/>
+        <!--
+        <source src="http://vjs.zencdn.net/v/oceans.mp4" type='video/mp4'/>
+        <source src="http://vjs.zencdn.net/v/oceans.webm" type='video/webm'/>
+        <source src="http://vjs.zencdn.net/v/oceans.ogv" type='video/ogg'/>
+        <p class="vjs-no-js">
+            To view this video please enable JavaScript, and consider upgrading to a web browser that
+            <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a>
+        </p>
+        -->
+    </video>
+
+<!--
+<h1 id="first_header">
+    Click the link to change this text color.
+</h1>
+<a href="#" onclick="changeColor()">CLICK ME</a>
+-->
+</body>
+</html>
