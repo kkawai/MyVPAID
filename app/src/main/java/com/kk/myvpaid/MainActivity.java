@@ -1,11 +1,13 @@
 package com.kk.myvpaid;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -22,8 +24,12 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String TAG = "MyVPAID";
 
-    WebView webView;
-    WebViewClient webViewClient = new WebViewClient() {
+    enum AdState {ad_session_in_progress, ad_session_not_started, error, completed, cancelled}
+
+    private AdState adState = AdState.ad_session_not_started;
+
+    private WebView webView;
+    private WebViewClient webViewClient = new WebViewClient() {
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
             Log.d(TAG,"shouldOverrideUrlLoading ");
@@ -70,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
+        disableWebViewTouches(webView);
         webView.setBackgroundColor(Color.BLACK);
         webView.setWebViewClient(webViewClient);
         webView.setWebChromeClient(new WebChromeClientCustomPoster());
@@ -88,6 +95,40 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG,"width: " + width + " height: " + height + " density: " + displayMetrics.density);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    @JavascriptInterface
+    public void onAdStarted() {
+        adState = AdState.ad_session_in_progress;
+        Log.d(TAG,"onAdStarted. adState: " + adState.name());
+    }
+
+    @JavascriptInterface
+    public void onAdCompleted() {
+        if (adState == AdState.ad_session_in_progress)
+            adState = AdState.completed;
+        Log.d(TAG,"onAdCompleted. adState: " + adState.name());
+    }
+
+    @JavascriptInterface
+    public void onAdError() {
+        if (adState != AdState.completed)
+            adState = AdState.error;
+        Log.d(TAG,"onAdError. adState: " + adState.name());
+    }
+
+    @JavascriptInterface
+    public void onAdCancelled() {
+        if (adState != AdState.completed) {
+            adState = AdState.cancelled;
+        }
+        Log.d(TAG,"onAdCancelled. adState: " + adState.name());
+        finish();
+    }
+
     @JavascriptInterface
     public void log(String message) {
         Log.d("MyJS", message);
@@ -95,10 +136,6 @@ public class MainActivity extends AppCompatActivity {
 
     @JavascriptInterface
     public String getVastXML() {
-        return getVastVpaidXml();
-    }
-
-    private String getVastVpaidXml() {
         String s = null;
         try {
             InputStream is = getResources().openRawResource(R.raw.vast_vpaid);
@@ -110,20 +147,37 @@ public class MainActivity extends AppCompatActivity {
 
     static String getStringFromIs(InputStream is) throws IOException {
         final StringBuilder out = new StringBuilder();
-
         byte[] b = new byte[4096];
         for (int n; (n = is.read(b)) != -1; ) {
             out.append(new String(b, 0, n));
         }
-
         return out.toString();
     }
 
     private class WebChromeClientCustomPoster extends WebChromeClient {
-
         @Override
         public Bitmap getDefaultVideoPoster() {
             return Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        try {
+            if (webView != null && adState == AdState.ad_session_in_progress)
+                webView.loadUrl("javascript:fullScreenToggle()");
+        }catch (Exception e){
+            Log.e(TAG,"onConfigurationChanged. webView error: " + e.getMessage());
+        }
+    }
+
+    private void disableWebViewTouches(WebView webView) {
+        webView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true;
+            }
+        });
     }
 }

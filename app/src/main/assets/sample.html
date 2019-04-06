@@ -4,86 +4,98 @@
         >
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
-    <title> </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
+    <title></title>
     <link href="http://vjs.zencdn.net/5.4.6/video-js.css" rel="stylesheet">
     <script src="http://vjs.zencdn.net/5.4.6/video.js"></script>
     <link rel="stylesheet" href=" videojs.vast.vpaid.min.css">
     <script type="text/javascript" src="videojs_5.vast.vpaid.min.js"></script>
 </head>
 
-<body style='margin:0;padding:0;' >
+<body style='margin:0;padding:0;'>
 
-    <video id="player" class="video-js vjs-skin vjs-16-9"
-           preload="none"
-           poster="blankimage.png"
-           data-setup='{}'>
-        <source src="blankvideo.mp4" type="video/mp4"/>
-    </video>
+<video id="player" class="video-js vjs-skin vjs-16-9"
+       preload="none"
+       poster="blankimage.png"
+       data-setup='{}'>
+    <source src="blankvideo.mp4" type="video/mp4"/>
+</video>
 
-    <script>
-        var xmlContent = AndroidInterface.getVastXML();
-        console.log("MyJS got xmlContent");
-        function requestVASTXML(callback) {
-            console.log("MyJS in requestVASTXML");
-            callback(null, xmlContent);
-        }
-    </script>
+<script>
+    var xmlContent = AndroidInterface.getVastXML();
+    console.log("MyJS got xmlContent");
+    function requestVASTXML(callback) {
+        console.log("MyJS in requestVASTXML");
+        callback(null, xmlContent);
+    }
+</script>
 
-    <script type="text/javascript">
+<script type="text/javascript">
 
-        videojs.plugin('ads-setup', function(opts) {
+    videojs.plugin('ads-setup', function(opts) {
 
-           var player = this;
-           var vastAd = player.vastClient({
-               playAdAlways: true,
-               adCancelTimeout: 10000,
-               adsEnabled: true,
-               adTagXML: requestVASTXML
-           });
+       var player = this;
+       var vastAd = player.vastClient({
+           playAdAlways: true,
+           adCancelTimeout: 10000,
+           adsEnabled: true,
+           adTagXML: requestVASTXML
+       });
 
-           player.on('vast.adError', function(evt) {
-              AndroidInterface.log("vast.adError 1");
-           });
+       player.on('vast.adError', function(evt) {
+          AndroidInterface.onAdError();
+       });
 
-           player.on('vast.adStart', function() {
-              AndroidInterface.log("vast.adStart");
-           });
+       player.on('vast.adStart', function() {
+          AndroidInterface.onAdStarted();
+       });
 
-           player.on('vast.adSkip', function() {
-              AndroidInterface.log("vast.adSkip");
-           });
+       player.on('vast.adSkip', function() {
+          AndroidInterface.onAdCancelled();
+       });
 
-           player.on('vast.adsCancel', function() {
-              AndroidInterface.log("vast.adsCancel");
-           });
+       player.on('vast.adsCancel', function() {
+          AndroidInterface.onAdCancelled();
+       });
 
-           player.on('vast.contentStart', function() {
-              AndroidInterface.log("vast.contentStart");
-           });
+       player.on('vast.contentStart', function() {
+          AndroidInterface.onAdCompleted();
+       });
 
-           player.on('vast.contentEnd', function() {
-              AndroidInterface.log("vast.contentEnd");
-           });
+       player.on('vast.contentEnd', function() {
+          AndroidInterface.onAdCompleted();
+       });
 
-        });
+    });
 
-        videojs('player', {
-           'techOrder': ['html5'],
-           'plugins': {
-                'ads-setup': {
-                    'adsEnabled': true,
-                }
-           }
-        });
-    </script>
+    videojs('player', {
+       'techOrder': ['html5'],
+       'plugins': {
+            'ads-setup': {
+                'adsEnabled': true,
+            }
+       }
+    });
+</script>
 
-    <script>
-        function play() {
-            console.log("1 in play");
-            videojs('player').play();
-        }
-    </script>
+<script type="text/javascript">
+    function play() {
+        console.log("1 in play");
+        videojs('player').play();
+    }
+</script>
+
+<script type="text/javascript">
+    function fullScreenToggle() {
+        videojs('player').FullscreenToggle();
+    }
+</script>
+
+<script type="text/javascript">
+    function pause() {
+        videojs('player').pause();
+    }
+</script>
 
 </body>
 </html>
