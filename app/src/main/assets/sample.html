@@ -31,10 +31,10 @@
 </script>
 
 <script type="text/javascript">
-
+    var player;
     videojs.plugin('ads-setup', function(opts) {
 
-       var player = this;
+       player = this;
        var vastAd = player.vastClient({
            playAdAlways: true,
            adCancelTimeout: 10000,
@@ -76,24 +76,39 @@
             }
        }
     });
-</script>
 
-<script type="text/javascript">
+    function fullScreenToggle() {
+        console.log("MyJS tried to resize player");
+
+        player.muted( true );
+    }
+
+    function pause() {
+        player.pause();
+    }
+
     function play() {
-        console.log("1 in play");
-        videojs('player').play();
+        player.play();
+    }
+
+    function toggleMute() {
+        player.muted( true );
     }
 </script>
 
 <script type="text/javascript">
+
+</script>
+
+<script type="text/javascript">
     function fullScreenToggle() {
-        videojs('player').FullscreenToggle();
+        console.log("MyJS tried to resize player");
     }
 </script>
 
 <script type="text/javascript">
     function pause() {
-        videojs('player').pause();
+        player.pause();
     }
 </script>
 
