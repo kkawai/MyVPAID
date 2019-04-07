@@ -23,7 +23,6 @@ public class MainActivity extends AppCompatActivity {
     static final String TAG = "MyVPAID";
     static final String HTML_PAGE = "vpaid_player.html";
     enum AdState {ad_session_in_progress, ad_session_not_started, error, completed, cancelled}
-    private Handler handler = new Handler(Looper.myLooper());
     private AdState adState = AdState.ad_session_not_started;
     private WebView webView;
     private TextView skipButton;
@@ -46,15 +45,10 @@ public class MainActivity extends AppCompatActivity {
     public void onAdStarted() {
         adState = AdState.ad_session_in_progress;
         Log.d(TAG,"onAdStarted. adState: " + adState.name());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
-            }
-        });
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
                 startTimer();
             }
         });
