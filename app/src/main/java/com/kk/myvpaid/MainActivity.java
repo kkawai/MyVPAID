@@ -1,8 +1,11 @@
 package com.kk.myvpaid;
 
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -27,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
 
     enum AdState {ad_session_in_progress, ad_session_not_started, error, completed, cancelled}
 
+    private Handler handler = new Handler(Looper.myLooper());
+
     private AdState adState = AdState.ad_session_not_started;
 
     private WebView webView;
@@ -38,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
-        webView.setOnTouchListener(Utils.getDisabledTouchListener());
+        //webView.setOnTouchListener(Utils.getDisabledTouchListener());
         webView.setBackgroundColor(Color.BLACK);
         webView.setWebViewClient(webViewClient);
         webView.setWebChromeClient(new Utils.MyWebChromeClientCustomPoster());
@@ -46,15 +51,20 @@ public class MainActivity extends AppCompatActivity {
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
-        String basePath = "file:android_asset/"+HTML_PAGE;
+        String basePath = "file:android_asset/" + HTML_PAGE;
         webView.loadUrl(basePath);
         webView.addJavascriptInterface(this, "AndroidInterface");
     }
-
     @JavascriptInterface
     public void onAdStarted() {
         adState = AdState.ad_session_in_progress;
         Log.d(TAG,"onAdStarted. adState: " + adState.name());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
+            }
+        }, 100);
     }
 
     @JavascriptInterface
@@ -91,13 +101,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        try {
-            if (webView != null && adState == AdState.ad_session_in_progress)
-                webView.loadUrl("javascript:fullScreenToggle()");
-        }catch (Exception e){
-            Log.e(TAG,"onConfigurationChanged. webView error: " + e.getMessage());
-        }
+    protected void onDestroy() {
+        webView.clearCache(true);
+        webView.clearHistory();
+        super.onDestroy();
     }
 }

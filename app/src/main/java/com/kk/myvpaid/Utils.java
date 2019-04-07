@@ -2,6 +2,7 @@ package com.kk.myvpaid;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
@@ -55,6 +56,15 @@ class Utils {
         //int height = displayMetrics.heightPixels;
         //Log.d(TAG,"width: " + width + " height: " + height + " density: " + displayMetrics.density);
         return displayMetrics;
+    }
+
+    static String orientation(Configuration configuration) {
+        if (configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            return "landscape";
+        } else if (configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            return "portrait";
+        }
+        return "unknown orientation";
     }
 
 }
