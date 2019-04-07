@@ -16,7 +16,6 @@
         <activity
             android:name=".MainActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
-            android:screenOrientation="landscape"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             >
             <intent-filter>

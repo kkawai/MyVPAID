@@ -26,7 +26,7 @@ import java.io.InputStream;
 public class MainActivity extends AppCompatActivity {
 
     static final String TAG = "MyVPAID";
-    static final String HTML_PAGE = "sample.html";
+    static final String HTML_PAGE = "vpaid_player.html";
 
     enum AdState {ad_session_in_progress, ad_session_not_started, error, completed, cancelled}
 
@@ -41,9 +41,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
-        //webView.setOnTouchListener(Utils.getDisabledTouchListener());
+        webView.setOnTouchListener(Utils.getDisabledTouchListener());
         webView.setBackgroundColor(Color.BLACK);
         webView.setWebViewClient(webViewClient);
         webView.setWebChromeClient(new Utils.MyWebChromeClientCustomPoster());
@@ -59,12 +60,12 @@ public class MainActivity extends AppCompatActivity {
     public void onAdStarted() {
         adState = AdState.ad_session_in_progress;
         Log.d(TAG,"onAdStarted. adState: " + adState.name());
-        handler.postDelayed(new Runnable() {
+        handler.post(new Runnable() {
             @Override
             public void run() {
                 setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
             }
-        }, 100);
+        });
     }
 
     @JavascriptInterface
