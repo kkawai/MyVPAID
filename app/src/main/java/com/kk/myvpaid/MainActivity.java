@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
-
     static final String TAG = "MyVPAID";
     static final String HTML_PAGE = "vpaid_player.html";
     enum AdState {ad_session_in_progress, ad_session_not_started, error, completed, cancelled}
@@ -32,7 +31,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        if (Config.DO_USE_SCREEN_RESIZE_HACK)
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
         Utils.loadWebView(webView);
@@ -54,7 +54,8 @@ public class MainActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
+                if (Config.DO_USE_SCREEN_RESIZE_HACK)
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
                 startTimer();
             }
         });
@@ -113,6 +114,8 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         if (skipCountdown != null)
             skipCountdown.cancel();
+        webView.clearHistory();  //TODO remove when fully done; we want to cache
+        webView.clearCache(true);
     }
 
     private void addMuteButton() {

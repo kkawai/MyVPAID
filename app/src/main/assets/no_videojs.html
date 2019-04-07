@@ -5,20 +5,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
-    <title></title>
-    <!--<link href="http://vjs.zencdn.net/5.4.6/video-js.css" rel="stylesheet">-->
-    <!--<link rel="stylesheet" href="videojs.vast.vpaid.min.css">-->
-    <!--<link rel="stylesheet" href="mystyle.css">-->
+    <title>     </title>
+    <link href="http://vjs.zencdn.net/5.4.6/video-js.min.css" rel="stylesheet">
+    <script src="http://vjs.zencdn.net/5.4.6/video.min.js"></script>
+
+    <link rel="stylesheet" href="videojs.vast.vpaid.min.css">
+    <script type="text/javascript" src="videojs_5.vast.vpaid.min.js"></script>
+
+    <link rel="stylesheet" href="mystyle.css">
 </head>
 
 <body style='margin:0;padding:0;'>
 
-<video id="player"
-       autoplay
+<video id="example_video_1" class="video-js vjs-default-skin vjs-skin vjs-16-9"
        controls
-       preload="preload"
-       poster="blankimage.png">
-    <source src="http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4" type="video/mp4"/>
+       poster="https://video-js.zencoder.com/oceans-clip.png"
+       data-setup='{"example_option":true}'>
+    <source src="https://video-js.zencoder.com/oceans-clip.mp4" type="video/mp4" />
+    <p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="http://videojs.com/html5-video-support/" target="_blank">supports HTML5 video</a></p>
 </video>
 
 </body>
