@@ -6,8 +6,22 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"/>
     <title></title>
+
+    <!-- I tried both of these newer versions of videojs but
+         the audio bug still persists and it's actually worse
+         than 5.4.6
+    <link href="http://vjs.zencdn.net/7.4.1/video-js.min.css" rel="stylesheet">
+    <script src="http://vjs.zencdn.net/7.4.1/video.min.js"></script>
+    -->
+
+    <!--
+    <link href="http://xmpp.instachat.us/video-js-7.5.3/video-js.min.css" rel="stylesheet">
+    <script src="http://xmpp.instachat.us/video-js-7.5.3/video.min.js"></script>
+    -->
+
     <link href="http://vjs.zencdn.net/5.4.6/video-js.min.css" rel="stylesheet">
     <script src="http://vjs.zencdn.net/5.4.6/video.min.js"></script>
+
     <link rel="stylesheet" href="videojs.vast.vpaid.min.css">
     <script type="text/javascript" src="videojs_5.vast.vpaid.min.js"></script>
 
@@ -17,7 +31,7 @@
 <body style='margin:0;padding:0;'>
 
 <video id="player" class="video-js vjs-skin vjs-16-9"
-       preload="auto"
+       preload="none"
        poster="blankimage.png">
     <source src="blankvideo.mp4" type="video/mp4"/>
 </video>
@@ -33,14 +47,12 @@
 
 <script type="text/javascript">
     var player;
-    var isMuted;
-    var bigPlayButton;
     videojs.plugin('ads-setup', function(opts) {
 
        player = this;
        var vastAd = player.vastClient({
            playAdAlways: true,
-           adCancelTimeout: 10000,
+           adCancelTimeout: 7000,
            adsEnabled: true,
            adTagXML: requestVASTXML
        });
@@ -62,7 +74,6 @@
        });
 
        player.on('vast.contentStart', function() {
-          player.hide();
           AndroidInterface.onAdCompleted();
        });
 
@@ -85,12 +96,12 @@
         player.play();
     }
 
-    function fullScreenToggle() {
-
+    function mute() {
+        player.muted(true);
     }
 
-    function toggleMute() {
-
+    function unMute() {
+        player.muted(false);
     }
 </script>
 
