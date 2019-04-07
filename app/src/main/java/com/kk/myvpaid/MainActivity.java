@@ -166,31 +166,21 @@ public class MainActivity extends AppCompatActivity {
         skipCountdown = new CountDownTimer(1000 * SKIP_AD_IN, 500) {
             @Override
             public void onTick(final long millisUntilFinished) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        skipButton.setVisibility(View.VISIBLE);
-                        int seconds = (int)millisUntilFinished/1000;
-                        if (seconds == 0)
-                            skipButton.setText("         ");
-                        else
-                            skipButton.setText("Skip Ad in " + seconds + " Sec");
-                    }
-                });
+                skipButton.setVisibility(View.VISIBLE);
+                int seconds = (int)millisUntilFinished/1000;
+                if (seconds == 0)
+                    skipButton.setText("         ");
+                else
+                    skipButton.setText("Skip Ad in " + seconds + " Sec");
             }
 
             @Override
             public void onFinish() {
-                runOnUiThread(new Runnable() {
+                skipButton.setText("Skip");
+                skipButton.setOnClickListener(new View.OnClickListener() {
                     @Override
-                    public void run() {
-                        skipButton.setText("Skip");
-                        skipButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                skipAd();
-                            }
-                        });
+                    public void onClick(View view) {
+                        skipAd();
                     }
                 });
             }
