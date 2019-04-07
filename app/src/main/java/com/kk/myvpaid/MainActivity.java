@@ -4,8 +4,6 @@ import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Gravity;
@@ -39,6 +37,14 @@ public class MainActivity extends AppCompatActivity {
         webView = findViewById(R.id.webview);
         Utils.loadWebView(webView);
         webView.addJavascriptInterface(this, "AndroidInterface");
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (adState == AdState.ad_session_in_progress) {
+            webView.loadUrl("javascript:play()");
+        }
     }
 
     @JavascriptInterface
@@ -108,8 +114,6 @@ public class MainActivity extends AppCompatActivity {
         if (skipCountdown != null)
             skipCountdown.cancel();
     }
-
-
 
     private void addMuteButton() {
         muteButton = (ImageView) LayoutInflater.from(this).inflate(R.layout.choc_mute_button, null, false);
@@ -184,6 +188,5 @@ public class MainActivity extends AppCompatActivity {
 
     private void skipAd() {
         onAdCompleted();
-        onAdCancelled();
     }
 }

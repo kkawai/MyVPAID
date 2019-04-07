@@ -73,7 +73,7 @@ class Utils {
     }
 
     static void loadWebView(WebView webView) {
-        webView.setOnTouchListener(Utils.getDisabledTouchListener());
+        //webView.setOnTouchListener(Utils.getDisabledTouchListener());
         webView.setBackgroundColor(Color.BLACK);
         webView.setWebViewClient(new MyWebviewClient());
         webView.setWebChromeClient(new Utils.MyWebChromeClientCustomPoster());
