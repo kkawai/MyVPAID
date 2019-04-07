@@ -4,13 +4,18 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
+import android.webkit.WebView;
 
 import java.io.IOException;
 import java.io.InputStream;
+
+import static com.kk.myvpaid.MainActivity.HTML_PAGE;
 
 class Utils {
 
@@ -65,6 +70,19 @@ class Utils {
             return "portrait";
         }
         return "unknown orientation";
+    }
+
+    static void loadWebView(WebView webView) {
+        webView.setOnTouchListener(Utils.getDisabledTouchListener());
+        webView.setBackgroundColor(Color.BLACK);
+        webView.setWebViewClient(new MyWebviewClient());
+        webView.setWebChromeClient(new Utils.MyWebChromeClientCustomPoster());
+        webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
+        webView.getSettings().setJavaScriptEnabled(true);
+        webView.setHorizontalScrollBarEnabled(false);
+        webView.setVerticalScrollBarEnabled(false);
+        String basePath = "file:android_asset/" + HTML_PAGE;
+        webView.loadUrl(basePath);
     }
 
 }

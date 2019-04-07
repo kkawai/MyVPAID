@@ -35,7 +35,6 @@ public class MainActivity extends AppCompatActivity {
     private AdState adState = AdState.ad_session_not_started;
 
     private WebView webView;
-    private WebViewClient webViewClient = new MyWebviewClient();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +43,10 @@ public class MainActivity extends AppCompatActivity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
-        webView.setOnTouchListener(Utils.getDisabledTouchListener());
-        webView.setBackgroundColor(Color.BLACK);
-        webView.setWebViewClient(webViewClient);
-        webView.setWebChromeClient(new Utils.MyWebChromeClientCustomPoster());
-        webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
-        webView.getSettings().setJavaScriptEnabled(true);
-        webView.setHorizontalScrollBarEnabled(false);
-        webView.setVerticalScrollBarEnabled(false);
-        String basePath = "file:android_asset/" + HTML_PAGE;
-        webView.loadUrl(basePath);
+        Utils.loadWebView(webView);
         webView.addJavascriptInterface(this, "AndroidInterface");
     }
+
     @JavascriptInterface
     public void onAdStarted() {
         adState = AdState.ad_session_in_progress;
@@ -99,12 +90,5 @@ public class MainActivity extends AppCompatActivity {
     @JavascriptInterface
     public String getVastXML() {
         return Utils.getTestVastVPAIDXML(this); //todo change later
-    }
-
-    @Override
-    protected void onDestroy() {
-        webView.clearCache(true);
-        webView.clearHistory();
-        super.onDestroy();
     }
 }
