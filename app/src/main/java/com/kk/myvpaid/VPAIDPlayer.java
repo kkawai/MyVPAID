@@ -34,8 +34,9 @@ class VPAIDPlayer extends FrameLayout {
     private VPAIDAdStateListener listener;
     private boolean alreadyReportedFinished;
     private OnClickListener onAdClickedListener;
-    private boolean isInitiallyMuted;
+    private boolean isInitiallyMuted, doClearWebViewCacheWhenDestroyed;
     private String vastXMLContents;
+    private JavaScriptInterface javaScriptInterface = new JavaScriptInterface();
 
     public VPAIDPlayer(@NonNull Context context) {
         super(context);
@@ -43,6 +44,10 @@ class VPAIDPlayer extends FrameLayout {
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         setLayoutParams(params);
         setBackgroundColor(Color.BLACK);//could be kept in config
+    }
+
+    VPAIDAdState getAdState() {
+        return adState;
     }
 
     void setInitiallyMuted(boolean isInitiallyMuted) {
@@ -58,38 +63,36 @@ class VPAIDPlayer extends FrameLayout {
         this.onAdClickedListener = onAdClickedListener;
     }
 
-    void onCreate() {
+    void setClearWebViewCacheWhenDestroyed(boolean doClearWebViewCacheWhenDestroyed) {
+        this.doClearWebViewCacheWhenDestroyed = doClearWebViewCacheWhenDestroyed;
+    }
+
+    /**
+     * Starts the vpaid ad.  Before calling, consider calling:
+     *
+     * setInitiallyMuted
+     * setVastXMLContents
+     * setVPAIDAdStateListener
+     * setClearWebViewCacheWhenDestroyed
+     */
+    void startVPAIDAd() {
         webView = new WebView(getContext());
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
               LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT, Gravity.CENTER);
         webView.setLayoutParams(params);
         addView(webView);
         VPAIDPlayerUtils.loadWebView(webView, onAdClickedListener);
-        webView.addJavascriptInterface(this, "AndroidInterface");
+        webView.addJavascriptInterface(javaScriptInterface, "AndroidInterface");
     }
 
-    void onResume() {
+    void resume() {
         if (adState == VPAIDAdState.ad_session_in_progress) {
-            webView.loadUrl("javascript:play()");
-        }
-    }
-
-    @JavascriptInterface
-    public void onAdStarted() {
-        adState = VPAIDAdState.ad_session_in_progress;
-        VPAIDPlayerUtils.log("onAdStarted. adState: " + adState.name());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                startTimer();
+            try {
+                webView.loadUrl("javascript:play()");
+            }catch (Throwable t) {
+                VPAIDPlayerUtils.log("resume failed", t);
             }
-        });
-        listener.onVPAIDAdStateChanged(VPAIDAdState.ad_session_in_progress);
-    }
-
-    @JavascriptInterface
-    public void onAdCompleted() {
-        onSessionFinished(VPAIDAdState.completed);
+        }
     }
 
     private void onSessionFinished(VPAIDAdState finishState) {
@@ -102,14 +105,42 @@ class VPAIDPlayer extends FrameLayout {
         }
     }
 
-    @JavascriptInterface
-    public void onAdError() {
-        onSessionFinished(VPAIDAdState.error);
-    }
+    class JavaScriptInterface {
 
-    @JavascriptInterface
-    public void onAdCancelled() {
-        onSessionFinished(VPAIDAdState.cancelled);
+        @JavascriptInterface
+        public void onAdStarted() {
+            adState = VPAIDAdState.ad_session_in_progress;
+            VPAIDPlayerUtils.log("onAdStarted. adState: " + adState.name());
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    addOverlayButtons();
+                }
+            });
+            listener.onVPAIDAdStateChanged(VPAIDAdState.ad_session_in_progress);
+        }
+
+        @JavascriptInterface
+        public void onAdCompleted() {
+            onSessionFinished(VPAIDAdState.completed);
+        }
+
+        @JavascriptInterface
+        public void onAdError() {
+            onSessionFinished(VPAIDAdState.error);
+        }
+
+        @JavascriptInterface
+        public void onAdCancelled() {
+            onSessionFinished(VPAIDAdState.cancelled);
+        }
+
+        @JavascriptInterface
+        public String getVastXML() {
+            if (vastXMLContents != null)
+                return vastXMLContents;
+            return VPAIDPlayerUtils.getTestVastVPAIDXML(getContext());
+        }
     }
 
     private void finishSession() {
@@ -117,24 +148,19 @@ class VPAIDPlayer extends FrameLayout {
             skipCountdown.cancel();
     }
 
-    @JavascriptInterface
-    public void log(String message) {
-        VPAIDPlayerUtils.log("Javascript: " + message);
-    }
-
-    @JavascriptInterface
-    public String getVastXML() {
-        if (vastXMLContents != null)
-            return vastXMLContents;
-        return VPAIDPlayerUtils.getTestVastVPAIDXML(getContext());
-    }
-
     private int muteButtonRes = R.drawable.choc_volume_up_large_white_18dp; //default sound on
 
-    void onDestroy() {
-        finishSession();
-        webView.clearHistory();  //TODO remove when fully done; we want to cache
-        webView.clearCache(true);
+    //can be called by the parent activity
+    void destroy() {
+        try {
+            finishSession();
+            if (doClearWebViewCacheWhenDestroyed) {
+                webView.clearHistory();
+                webView.clearCache(true);
+            }
+        }catch (Throwable t) {
+            VPAIDPlayerUtils.log("destroy failed", t);
+        }
     }
 
     private void addMuteButton() {
@@ -171,18 +197,7 @@ class VPAIDPlayer extends FrameLayout {
         FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.RIGHT);
         skipButton.setLayoutParams(layoutParams);
         addView(skipButton);
-        skipButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onAdCancelled();
-            }
-        });
         skipButton.bringToFront();
-    }
-
-    private void startTimer() {
-        addMuteButton();
-        addSkipButton();
         skipCountdown = new CountDownTimer(1000 * VPAIDPlayerConfig.SKIP_AD_IN, 500) {
             @Override
             public void onTick(final long millisUntilFinished) {
@@ -200,7 +215,7 @@ class VPAIDPlayer extends FrameLayout {
                 skipButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        skipAd();
+                        javaScriptInterface.onAdCancelled();
                     }
                 });
             }
@@ -208,7 +223,9 @@ class VPAIDPlayer extends FrameLayout {
         skipCountdown.start();
     }
 
-    private void skipAd() {
-        onAdCompleted();
+    private void addOverlayButtons() {
+        addMuteButton();
+        addSkipButton();
     }
+
 }

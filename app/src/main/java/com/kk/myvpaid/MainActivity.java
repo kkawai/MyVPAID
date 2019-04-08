@@ -21,8 +21,10 @@ public class MainActivity extends AppCompatActivity implements VPAIDPlayer.VPAID
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(vpaidPlayer = new VPAIDPlayer(this));
         vpaidPlayer.setVPAIDAdStateListener(this, onAdClickListener);
-        vpaidPlayer.setInitiallyMuted(false);
-        vpaidPlayer.onCreate();
+        vpaidPlayer.setInitiallyMuted(true);
+        vpaidPlayer.setClearWebViewCacheWhenDestroyed(false);
+        vpaidPlayer.setVastXMLContents(null); //null - internal test vast xml will be used
+        vpaidPlayer.startVPAIDAd();
     }
 
     private View.OnClickListener onAdClickListener = new View.OnClickListener() {
@@ -58,13 +60,13 @@ public class MainActivity extends AppCompatActivity implements VPAIDPlayer.VPAID
     @Override
     protected void onResume() {
         super.onResume();
-        vpaidPlayer.onResume();
+        vpaidPlayer.resume();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        vpaidPlayer.onDestroy();
+        vpaidPlayer.destroy();
     }
 
     private void finishVPAIDAdSession() {
