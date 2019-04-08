@@ -132,8 +132,7 @@ class VPAIDPlayer extends FrameLayout {
     private int muteButtonRes = R.drawable.choc_volume_up_large_white_18dp; //default sound on
 
     void onDestroy() {
-        if (skipCountdown != null)
-            skipCountdown.cancel();
+        finishSession();
         webView.clearHistory();  //TODO remove when fully done; we want to cache
         webView.clearCache(true);
     }
