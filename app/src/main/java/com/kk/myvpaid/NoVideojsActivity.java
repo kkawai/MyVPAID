@@ -20,7 +20,7 @@ public class NoVideojsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         webView = findViewById(R.id.webview);
         webView.setBackgroundColor(Color.BLACK);
-        webView.setWebChromeClient(new Utils.MyWebChromeClientCustomPoster());
+        webView.setWebChromeClient(new VPAIDPlayerUtils.MyWebChromeClientCustomPoster());
         webView.setWebViewClient(new WebViewClient());
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.getSettings().setJavaScriptEnabled(true);

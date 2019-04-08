@@ -1,195 +1,73 @@
 package com.kk.myvpaid;
 
-import android.annotation.SuppressLint;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebView;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+import com.kk.myvpaid.VPAIDPlayerConfig.VPAIDAdState;
+
+public class MainActivity extends AppCompatActivity implements VPAIDPlayer.VPAIDAdStateListener {
     static final String TAG = "MyVPAID";
-    static final String HTML_PAGE = "vpaid_player.html";
-    enum AdState {ad_session_in_progress, ad_session_not_started, error, completed, cancelled}
-    private AdState adState = AdState.ad_session_not_started;
-    private WebView webView;
-    private TextView skipButton;
-    private ImageView muteButton;
-    private CountDownTimer skipCountdown;
-    private static final int SKIP_AD_IN = 8;
+    private VPAIDPlayer vpaidPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        if (Config.DO_USE_SCREEN_RESIZE_HACK)
+        if (VPAIDPlayerConfig.DO_USE_SCREEN_RESIZE_HACK)
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(R.layout.activity_main);
-        webView = findViewById(R.id.webview);
-        Utils.loadWebView(webView);
-        webView.addJavascriptInterface(this, "AndroidInterface");
+        setContentView(vpaidPlayer = new VPAIDPlayer(this));
+        vpaidPlayer.setVPAIDAdStateListener(this, onAdClickListener);
+        vpaidPlayer.setInitiallyMuted(false);
+        vpaidPlayer.onCreate();
+    }
+
+    private View.OnClickListener onAdClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            Toast.makeText(MainActivity.this, "ad clicked!", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    @Override
+    public void onVPAIDAdStateChanged(VPAIDAdState adState) {
+        Log.d(TAG,"onVPAIDAdStateChanged. adState: " + adState.name());
+        switch (adState) {
+            case ad_session_in_progress:
+                if (VPAIDPlayerConfig.DO_USE_SCREEN_RESIZE_HACK) {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
+                }
+                break;
+            case completed:
+                finishVPAIDAdSession();
+                break;
+            case cancelled:
+                finishVPAIDAdSession();
+                break;
+            case error:
+                finishVPAIDAdSession();
+                break;
+            default:
+                break;
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (adState == AdState.ad_session_in_progress) {
-            webView.loadUrl("javascript:play()");
-        }
+        vpaidPlayer.onResume();
     }
-
-    @JavascriptInterface
-    public void onAdStarted() {
-        adState = AdState.ad_session_in_progress;
-        Log.d(TAG,"onAdStarted. adState: " + adState.name());
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                if (Config.DO_USE_SCREEN_RESIZE_HACK)
-                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_USER);
-                startTimer();
-            }
-        });
-    }
-
-    @JavascriptInterface
-    public void onAdCompleted() {
-        if (adState == AdState.ad_session_in_progress)
-            adState = AdState.completed;
-        Log.d(TAG,"onAdCompleted. adState: " + adState.name());
-        finishSession();
-    }
-
-    @JavascriptInterface
-    public void onAdError() {
-        if (adState != AdState.completed)
-            adState = AdState.error;
-        Log.d(TAG,"onAdError. adState: " + adState.name());
-        finishSession();
-    }
-
-    @JavascriptInterface
-    public void onAdCancelled() {
-        if (adState != AdState.completed) {
-            adState = AdState.cancelled;
-        }
-        Log.d(TAG,"onAdCancelled. adState: " + adState.name());
-        finishSession();
-    }
-
-    private void finishSession() {
-        if (skipCountdown != null)
-            skipCountdown.cancel();
-        finish();
-    }
-
-    @JavascriptInterface
-    public void log(String message) {
-        Log.d("MyJS", message);
-    }
-
-    @JavascriptInterface
-    public String getVastXML() {
-        return Utils.getTestVastVPAIDXML(this); //todo change later
-    }
-
-    private void addView(View view) {
-        FrameLayout frameLayout = findViewById(R.id.main_frame);
-        frameLayout.addView(view);
-    }
-
-    private int muteButtonRes = R.drawable.choc_volume_up_large_white_18dp; //default sound on
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (skipCountdown != null)
-            skipCountdown.cancel();
-        webView.clearHistory();  //TODO remove when fully done; we want to cache
-        webView.clearCache(true);
+        vpaidPlayer.onDestroy();
     }
 
-    private void addMuteButton() {
-        muteButton = (ImageView) LayoutInflater.from(this).inflate(R.layout.choc_mute_button, null, false);
-
-        @SuppressLint("RtlHardcoded") FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.LEFT);
-        muteButton.setLayoutParams(layoutParams);
-        addView(muteButton);
-        muteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                muteSound(muteButtonRes == R.drawable.choc_volume_up_large_white_18dp);
-            }
-        });
-        muteSound(false); //todo true if inview
-        muteButton.bringToFront();
-    }
-
-    private void muteSound(boolean doMute) {
-        if (doMute) {
-            webView.loadUrl("javascript:mute()");
-            muteButtonRes = R.drawable.choc_volume_off_large_white_18dp;
-        } else {
-            webView.loadUrl("javascript:unMute()");
-            muteButtonRes = R.drawable.choc_volume_up_large_white_18dp;
-        }
-        muteButton.setImageResource(muteButtonRes);
-    }
-
-    private void addSkipButton() {
-        skipButton = (TextView) LayoutInflater.from(this).inflate(R.layout.choc_skip_button, null, false);
-
-        @SuppressLint("RtlHardcoded")
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP | Gravity.RIGHT);
-        skipButton.setLayoutParams(layoutParams);
-        addView(skipButton);
-        skipButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onAdCancelled();
-            }
-        });
-        skipButton.bringToFront();
-    }
-
-    private void startTimer() {
-        addMuteButton();
-        addSkipButton();
-        skipCountdown = new CountDownTimer(1000 * SKIP_AD_IN, 500) {
-            @Override
-            public void onTick(final long millisUntilFinished) {
-                skipButton.setVisibility(View.VISIBLE);
-                int seconds = (int)millisUntilFinished/1000;
-                if (seconds == 0)
-                    skipButton.setText("         ");
-                else
-                    skipButton.setText("Skip Ad in " + seconds + " Sec");
-            }
-
-            @Override
-            public void onFinish() {
-                skipButton.setText("Skip");
-                skipButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        skipAd();
-                    }
-                });
-            }
-        };
-        skipCountdown.start();
-    }
-
-    private void skipAd() {
-        onAdCompleted();
+    private void finishVPAIDAdSession() {
+        finish();
     }
 }

@@ -6,18 +6,16 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
 import java.io.IOException;
 import java.io.InputStream;
 
-import static com.kk.myvpaid.MainActivity.HTML_PAGE;
-
-class Utils {
+class VPAIDPlayerUtils {
 
     static class MyWebChromeClientCustomPoster extends WebChromeClient {
         @Override
@@ -72,17 +70,25 @@ class Utils {
         return "unknown orientation";
     }
 
-    static void loadWebView(WebView webView) {
+    static void loadWebView(WebView webView, View.OnClickListener onClickListener) {
         //webView.setOnTouchListener(Utils.getDisabledTouchListener());
-        webView.setBackgroundColor(Color.BLACK);
-        webView.setWebViewClient(new MyWebviewClient());
-        webView.setWebChromeClient(new Utils.MyWebChromeClientCustomPoster());
+        webView.setBackgroundColor(Color.BLACK); //could be kept in config
+        webView.setWebViewClient(new VPAIDWebViewClient(onClickListener));
+        webView.setWebChromeClient(new VPAIDPlayerUtils.MyWebChromeClientCustomPoster());
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.getSettings().setJavaScriptEnabled(true);
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
-        String basePath = "file:android_asset/" + HTML_PAGE;
+        String basePath = "file:android_asset/" + VPAIDPlayerConfig.HTML_PAGE;
         webView.loadUrl(basePath);
+    }
+
+    static void log(String message, Throwable t) {
+        Log.d(VPAIDPlayerConfig.TAG, message, t);
+    }
+
+    static void log(String message) {
+        Log.d(VPAIDPlayerConfig.TAG, message);
     }
 
 }
