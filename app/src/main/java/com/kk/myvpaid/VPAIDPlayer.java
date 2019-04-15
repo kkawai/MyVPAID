@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,7 +37,7 @@ class VPAIDPlayer extends FrameLayout {
     private String vastXMLContents;
     private JavaScriptInterface javaScriptInterface = new JavaScriptInterface();
 
-    public VPAIDPlayer(@NonNull Context context) {
+    public VPAIDPlayer(Context context) {
         super(context);
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
               LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
