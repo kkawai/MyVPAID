@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import java.io.IOException;
@@ -77,10 +78,13 @@ class VPAIDPlayerUtils {
         webView.setWebChromeClient(new VPAIDPlayerUtils.MyWebChromeClientCustomPoster());
         webView.getSettings().setAllowUniversalAccessFromFileURLs(true);
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setAppCacheEnabled(true);
+        webView.getSettings().setAppCachePath(webView.getContext().getCacheDir().getPath());
+        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
-        String basePath = "file:android_asset/" + VPAIDPlayerConfig.HTML_PAGE;
-        webView.loadUrl(basePath);
+        //String basePath = "file:android_asset/" + VPAIDPlayerConfig.HTML_PAGE;
+        webView.loadUrl("https://creatives.vdopia.com/vpaidplayer/vpaid_player.html");
     }
 
     static void log(String message, Throwable t) {
