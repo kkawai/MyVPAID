@@ -84,7 +84,7 @@ class VPAIDPlayerUtils {
         webView.setHorizontalScrollBarEnabled(false);
         webView.setVerticalScrollBarEnabled(false);
         //String basePath = "file:android_asset/" + VPAIDPlayerConfig.HTML_PAGE;
-        webView.loadUrl("https://creatives.vdopia.com/vpaidplayer/vpaid_player.html");
+        webView.loadUrl("https://s3.amazonaws.com/vdopia-sdk/vpaid_player.html");
     }
 
     static void log(String message, Throwable t) {
